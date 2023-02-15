@@ -78,13 +78,13 @@
 
 //// Задание 22
 //// Исключить из строки группы символов, расположенные между символами «/*» и «*/» включая границы. Предполагается, что нет вложенных скобок.
-int main (){
-    std::string Text;
-    int t, pos1, pos2;
-    Text = "It was raining, but the day /* It was Wednesday *\ was still very beautiful";
-    pos1 = Text.find( "/*" );
-    pos2 = Text.find( "*\\" );
-        t = pos2 - pos1;
-     Text.erase(pos1, t);
-      std::cout << Text;
-}
+// int main (){
+//     std::string Text;
+//     int t, pos1, pos2;
+//     Text = "It was raining, but the day /* It was Wednesday *\ was still very beautiful";
+//     pos1 = Text.find( "/*" );
+//     pos2 = Text.find( "*\\" );
+//         t = pos2 - pos1;
+//      Text.erase(pos1, t);
+//       std::cout << Text;
+// }
