@@ -6,15 +6,22 @@
 #include "DrawGraphics.h"
 #include <time.h>
 
+
+
 clock_t time_appState;
 clock_t time_animate;
 clock_t time_Stars;
+
+int Mechanic = 0;
+int Add = 0;
 int Cont;
-int cort;
+int cort = 0;
+bool Keybord = true;
+bool gameover = true;
+float d = 0, Rx = 0;
+
 Figure model = {{0.5, 0.}, false, 100, true};
 
-Meteroits Danger = {0. , 0.};
-float d = 0;
 
 void GameOver(){
     glPushMatrix();
@@ -30,10 +37,12 @@ void GameOver(){
         i++;
         glRasterPos2f(x + i*0.2, y);
     }
+    Keybord = false;
     glPopMatrix();
 }
 
 void Timer(int Result){
+    if(gameover == true){
     std::string str1 = "Your Result:           ";
     std::string str2 = std::to_string (Result);
     str1.replace(13, 5, str2);
@@ -50,18 +59,20 @@ void Timer(int Result){
     }
     GameOver();
 }
+}
 
 
 void TimerOil(){
-    int remains = 0;
+ if(gameover == true){
     clock_t Result = clock() / 1000;
-    remains = 20 - Result;
+    int remains = 0;
+    remains = 20 - Result + Add;
     if(remains > 0){
     std::string str1 = "Oil:           ";
     std::string str2 = std::to_string(remains);
     str1.replace(13, 5, str2);
-    float x = -1.7;
-    float y = 2.8;
+    float x = -2;
+    float y = 3;
     glColor3f(0.43, 0.65, 0.1);
     glRasterPos2f(x, y);
     int i = 0;
@@ -75,8 +86,27 @@ void TimerOil(){
 
     if((remains < 1) && (remains > -1)) Cont = Result;
   }
+}
 void ProcessKeys( unsigned char key, int x, int y);
 
+  void animateView(){
+
+    clock_t mT = clock();
+    float x, y;
+    if(model.IsFly == true){
+    if (mT < 1000.){
+        x = 0.;
+        y = 0.;
+    } else
+    { if (mT < 100000.){
+            x = 0.;
+            y = 0. - (1. - 0.) / (3000. - 1000.) * (mT - 1000.);
+        }
+    }
+    glTranslatef(x, y, 0);
+    }
+
+  }
 
 void Stars(){
 
@@ -93,7 +123,8 @@ void Stars(){
     glColor3ub(224., 255., 255.);
     }
     }
-        if(clock() > 90000.){
+     if(clock() > 9000.){
+     if(clock() < 90000.){
     for(unsigned int i = 0.; i < 10.; i++){
     glBegin(GL_POINTS);
     float r = rand()% 201 - 100.;
@@ -103,33 +134,32 @@ void Stars(){
     glVertex2f(rl, ml);
     glColor3ub(224., 255., 255.);
     }
-        }
+      }
+     }
+    glEnd();
+        animateView()  ;
+    glBegin(GL_POINTS);
+    glColor3ub(224., 255., 255.);
+    glVertex2f(0.5, 0.5);
+    glVertex2f(0.37, 0.21);
+    glVertex2f(1.1, 1.4);
+    glVertex2f(-0.35, 0.5);
+    glVertex2f(-0.16, 0.44);
+    glVertex2f(-0.13, 0.19);
+    glVertex2f(-0.5, 0.5);
+    glVertex2f(-0.16, -0.1);
+    glVertex2f(-0.43, -0.1);
+    glVertex2f(0.5, 0.5);
+    glVertex2f(0.5, 0.5);
+    glVertex2f(0.5, 0.5);
     glEnd();
     glPopMatrix();
-    }
+}
 }
 
-void animateView(){
-    clock_t mT = clock();
-    float x, y;
-    if(model.IsFly == true){
-        if (mT < 1000.){
-    x = 0.;
-    y = 0.;
-        } else
-        { if (mT < 100000.){
-    x = 0.;
-    y = 0. - (1. - 0.) / (3000. - 1000.) * (mT - 1000.);
-    }
-        }
-        glTranslatef(x, y, 0);
-    }
-
-
-}
 void animate_earth(){
     clock_t mT = clock();
-    float x, y, z;
+    float x, y;
     if(model.IsFly == true){
     if (mT < 1000.){
     x = 0.;
@@ -174,6 +204,8 @@ void earth(){
   }
 
 void addoil(float x, float y, float z){
+    glLoadIdentity();
+    glOrtho(0.0, 1600.0, 0, 1025, -100.0, 100.0);
     glPushMatrix();
     glLoadIdentity();
     glTranslatef(x, y, z);
@@ -190,32 +222,221 @@ void addoil(float x, float y, float z){
     glPopMatrix();
 }
 
-void MechanicOil(){
+void MechanicOil1(){
+    if(Mechanic == 0){
     glPushMatrix();
-    float x, y, z = 0, abr, bbr ;
-    x = 0.5;
+    float x, y, z = 0;
+    int x1, y1, x2, y2;
+    x = 0.3;
     y = 0.5;
+    x1 = x * 50;
+    y1 = y * 80;
+    x2 = rocket.pos.x * 10;
+    y2 = rocket.pos.y * 10;
     if(cort == 0){
     addoil(x, y, z);
-    for(float i = -15; i < 60000; i ++){
-      abr = y + (i/29000);
-      bbr = x + (i/30000);
-      if(rocket.pos.y == abr && rocket.pos.x == bbr){
+    for (int i = -2; i < 4; i++){
+      for (int w = -2; w < 4; w++){
+      if(y2 == y1 + i && x2 == x1 + w){
             cort += 1;
+             Add += 5;
+              Mechanic += 1;
       }
+     }
     }
-  }
-    std::cout << rocket.pos.y << "      " << abr << std::endl;
-    std::cout << rocket.pos.x << "      " << bbr << std::endl << std::endl;
+   }
     glPopMatrix();
 }
+}
+
+void MechanicOil2(){
+if(Mechanic == 1){
+    glPushMatrix();
+    float x, y, z = 0;
+    int x1, y1, x2, y2;
+    x = -0.1;
+    y = -0.68;
+    x1 = x ;
+    y1 = y ;
+    x2 = rocket.pos.x * 10;
+    y2 = rocket.pos.y * 20;
+    if(cort == 1){
+    addoil(x, y, z);
+    for (int i = -2; i < 8; i++){
+     for (int w = -2; w < 8; w++){
+      if(y2 == y1 + i && x2 == x1 + w){
+          cort += 1;
+          Add += 5;
+          Mechanic += 1;
+       }
+      }
+     }
+    }
+    glPopMatrix();
+ }
+}
+
+void MechanicOil3(){
+ if(Mechanic == 2){
+    glPushMatrix();
+    float x, y, z = 0;
+    int x1, y1, x2, y2;
+    x = - 0.56;
+    y = 0.77;
+    x1 = x * 50;
+    y1 = y * 75;
+    x2 = rocket.pos.x * 20;
+    y2 = rocket.pos.y * 10;
+    if(cort == 2){
+     addoil(x, y, z);
+     for (int i = -2; i < 8; i++){
+      for (int w = -2; w < 8; w++){
+       if(y2 == y1 + i && x2 == x1 + w){
+          cort += 1;
+          Add += 5;
+          Mechanic += 1;
+       }
+      }
+     }
+    }
+    std::cout << x1 << "      " << y1 << std::endl;
+    std::cout << x2 << "      " << y2 << std::endl << std::endl;
+    glPopMatrix();
+ }
+}
+
+void MechanicOil4(){
+ if(Mechanic == 3){
+    glPushMatrix();
+    float x, y, z = 0;
+    int x1, y1, x2, y2;
+    x = 0.55;
+    y = 0.58;
+    x1 = x * 100;
+    y1 = y * 80;
+    x2 = rocket.pos.x * 20;
+    y2 = rocket.pos.y * 10;
+    if(cort == 3){
+     addoil(x, y, z);
+     for (int i = -2; i < 8; i++){
+      for (int w = -2; w < 8; w++){
+       if(y2 == y1 + i && x2 == x1 + w){
+          cort += 1;
+          Add += 5;
+          Mechanic += 1;
+       }
+      }
+     }
+    }
+    std::cout << x1 << "      " << y1 << std::endl;
+    std::cout << x2 << "      " << y2 << std::endl << std::endl;
+    glPopMatrix();
+ }
+}
+
+void MechanicOil5(){
+ if(Mechanic == 4){
+    glPushMatrix();
+    float x, y, z = 0;
+    int x1, y1, x2, y2;
+    x = 0.75;
+    y = -0.58;
+    x1 = x * 100;
+    y1 = y;
+    x2 = rocket.pos.x * 20;
+    y2 = rocket.pos.y * 10;
+    if(cort == 4){
+     addoil(x, y, z);
+     for (int i = -2; i < 8; i++){
+      for (int w = -2; w < 8; w++){
+       if(y2 == y1 + i && x2 == x1 + w){
+          cort += 1;
+          Add += 5;
+          Mechanic += 1;
+       }
+      }
+     }
+    }
+    std::cout << x1 << "      " << y1 << std::endl;
+    std::cout << x2 << "      " << y2 << std::endl << std::endl;
+    glPopMatrix();
+ }
+}
+
+void MechanicOil6(){
+ if(Mechanic == 5){
+    glPushMatrix();
+    float x, y, z = 0;
+    int x1, y1, x2, y2;
+    x = -0.1;
+    y = -0.2;
+    x1 = -x * 83;
+    y1 = -y * 83;
+    x2 = rocket.pos.x * 20;
+    y2 = rocket.pos.y * 10;
+    if(cort == 5){
+     addoil(x, y, z);
+     for (int i = -2; i < 10; i++){
+      for (int w = -2; w < 10; w++){
+       if(y2 == y1 + i && x2 == x1 + w){
+          cort += 1;
+          Add += 5;
+          Mechanic += 1;
+       }
+      }
+     }
+    }
+    std::cout << x1 << "      " << y1 << std::endl;
+    std::cout << x2 << "      " << y2 << std::endl << std::endl;
+    glPopMatrix();
+ }
+}
+
+void MechanicOil7(){
+ if(Mechanic == 6){
+    glPushMatrix();
+    float x, y, z = 0;
+    int x1, y1, x2, y2;
+    x = -0.19;
+    y = 0.76;
+    x1 = 0;
+    y1 = y * 73;
+    x2 = rocket.pos.x * 20;
+    y2 = rocket.pos.y * 10;
+    if(cort == 6){
+     addoil(x, y, z);
+     for (int i = -2; i < 10; i++){
+      for (int w = -2; w < 10; w++){
+       if(y2 == y1 + i && x2 == x1 + w){
+          cort += 1;
+          Add += 5;
+          Mechanic += 1;
+       }
+      }
+     }
+    }
+    glPopMatrix();
+ }
+}
+
 
 void drawRocket(Figure & f){
     glPushMatrix();
     glTranslatef( 0, -3. , 0);
     glTranslatef(f.pos.x, f.pos.y, 0);
-    if(f.pos.r > 80) f.pos.r = 0;
-    if(f.pos.r < -80) f.pos.r = 0;
+    if(f.pos.r > 80){
+    gameover = false;
+    GameOver();
+    }
+
+    if(f.pos.r < -80){
+    gameover = false;
+    GameOver();
+    }
+    if (Mechanic == 7)
+    if(rocket.pos.y > -0.6){
+    rocket.pos.y -= 0.006;
+    }
     glRotatef(f.pos.r, 0, 0, 1);
     glBegin(GL_QUAD_STRIP);
     glColor3ub(112,128,144);   // 2.РАКЕТА
@@ -408,6 +629,66 @@ void drawRocket(Figure & f){
     glPopMatrix();
 }
 
+void animatedMoon(){
+
+}
+
+void Moon (){
+    glPushMatrix();
+    float x = 0;
+    glTranslatef(0, -1, 0);
+    if( Mechanic == 7 ){
+    if( Rx < 1){
+      Rx = Rx + 0.001;
+    }
+    glTranslatef(x, Rx, 0);
+    }
+    glBegin(GL_QUAD_STRIP);
+    glColor3ub(112, 128, 144);
+    glVertex2f(1, -1);
+    glColor3ub(112, 128, 144);
+    glVertex2f(-1, -1);
+    glColor3ub(176, 196, 222);
+    glVertex2f(0.4, -0.6);
+    glColor3ub(112, 128, 144);
+    glVertex2f(-0.4, -0.7);
+    glEnd();
+
+    glBegin(GL_QUAD_STRIP);
+    glColor3ub(112, 128, 144);
+    glVertex2f(-1, -1);
+    glColor3ub(112, 128, 144);
+    glVertex2f(1, -1);
+    glColor3ub(176, 196, 222);
+    glVertex2f(-0.5, -0.6);
+    glColor3ub(112, 128, 144);
+    glVertex2f(0.4, -0.7);
+    glEnd();
+
+    glBegin(GL_QUAD_STRIP);
+    glColor3ub(112, 128, 144);
+    glVertex2f(-1, -1);
+    glColor3ub(105, 105, 105);
+    glVertex2f(1, -1);
+    glColor3ub(128, 128, 128);
+    glVertex2f(-0.8, -0.7);
+    glColor3ub(112, 128, 144);
+    glVertex2f(0.4, -0.7);
+    glEnd();
+
+    glBegin(GL_QUAD_STRIP);
+    glColor3ub(105, 105, 105);
+    glVertex2f(1, -1);
+    glColor3ub(112, 128, 144);
+    glVertex2f(-1, -1);
+    glColor3ub(105, 105, 105);
+    glVertex2f(0.9, -0.9);
+    glColor3ub(128, 128, 128);
+    glVertex2f(0.8, -0.7);
+    glEnd();
+
+    glPopMatrix();
+}
 void view (){
 
     glPushMatrix();
@@ -564,6 +845,8 @@ void drowAnimate(){
     glTranslatef(x, y, 0);
 }
 
+
+
 int main(int argc, char* argv[])
 {
     srand( time(0) );
@@ -587,19 +870,23 @@ int main(int argc, char* argv[])
 
 void renderScene(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // эта функция должна быть первой в renderScene
-//     фон
     glPushMatrix();
     view();
     earth();
-    MechanicOil();
+    Moon();
+    MechanicOil1();
+    MechanicOil2();
+    MechanicOil3();
+    MechanicOil4();
+    MechanicOil5();
+    MechanicOil6();
+    MechanicOil7();
     Stars();
     glPopMatrix();
     glPushMatrix();
     glScalef(0.25, 0.25, 1);
-    // ракета
     TimerOil();
-    model.pos.x = -0.3;
-    model.pos.y = 0.3;
+
     glPushMatrix();
     drowAnimate();
     drawRocket(rocket);
@@ -614,6 +901,8 @@ void renderScene(void) {
 }
 
 void ProcessKeys( unsigned char key, int x, int y){
+
+    if(Keybord == true){
     if(key == 'w'){
         rocket.pos.y += 0.04;
         rocket.isRight = true;
@@ -635,4 +924,5 @@ void ProcessKeys( unsigned char key, int x, int y){
         d = d + 0.002;
     };
     glutPostRedisplay();
+    }
 }
