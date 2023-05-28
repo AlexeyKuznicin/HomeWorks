@@ -26,5 +26,4 @@ void initGraph();
 void plotGraph();
 void plotAxes();
 void renderScene(void);
-void SceneStastic(void);
 #endif // DRAWGRAPHICS_H
